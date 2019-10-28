@@ -1,8 +1,13 @@
-<img src="readmeicon.png" align="left" height=100 />
+<img src="readmeicon.png" align="left" height=150 />
 
 # Team 87528A Tower Takeover
+[![Build Status](https://travis-ci.org/brandon-gong/2020-TowerTakeover.svg?branch=master)](https://travis-ci.org/brandon-gong/2020-TowerTakeover)
+![Version](https://img.shields.io/badge/version-v0.5.0-informational.svg)
+
 This is Team 87528A Code Ninjas' code for the 2019-2020 VRC game,
 Tower Takeover.
+
+<br>
 
 There are two key strengths arising from the way the code is structured and
 implemented:
