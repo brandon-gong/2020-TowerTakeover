@@ -36,10 +36,10 @@ MecanumDriveTank::MecanumDriveTank(AxisInput lDrive, AxisInput rDrive, AxisInput
   this->lDriveAxis = lDrive;
   this->rDriveAxis = rDrive;
   this->strafeAxis = strafe;
-  this->frontRight.setBrake(brakeType::brake);
-  this->frontLeft.setBrake(brakeType::brake);
-  this->backRight.setBrake(brakeType::brake);
-  this->backLeft.setBrake(brakeType::brake);
+  this->frontRight.setBrake(brakeType::coast);
+  this->frontLeft.setBrake(brakeType::coast);
+  this->backRight.setBrake(brakeType::coast);
+  this->backLeft.setBrake(brakeType::coast);
 };
 
 /*
@@ -55,10 +55,10 @@ MecanumDriveTank::MecanumDriveTank(AxisInput inputs[3], motor motors[4]) :
   lDriveAxis = inputs[0];
   rDriveAxis = inputs[1];
   strafeAxis = inputs[2];
-  this->frontRight.setBrake(brakeType::brake);
-  this->frontLeft.setBrake(brakeType::brake);
-  this->backRight.setBrake(brakeType::brake);
-  this->backLeft.setBrake(brakeType::brake);
+  this->frontRight.setBrake(brakeType::coast);
+  this->frontLeft.setBrake(brakeType::coast);
+  this->backRight.setBrake(brakeType::coast);
+  this->backLeft.setBrake(brakeType::coast);
 };
 
 void MecanumDriveTank::update() {

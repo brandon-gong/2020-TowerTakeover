@@ -28,13 +28,26 @@
 #define _ROLLER_H_POWER 75
 
 /**
- * 
+ * Defines a subsystem for controlling a roller intake.
+ * Assumes one motor on each side and constant intake/outtake speeds.
+ * This may be modified to take an axis later on.
+ *
+ * @author Brandon Gong
+ * @date 11-1-19
  */
 class RollerIntake : public Subsystem {
 
   public:
   
+    /**
+     * Let the roller intake update with new input values from the two buttons.
+     * This should be called once per tick for smooth control.
+     */
     void update() override;
+
+    /**
+     * Create a new instance of roller intake.
+     */
     RollerIntake( ButtonInput inInput,
                   ButtonInput outInput,
                   int32_t leftMotorPort,

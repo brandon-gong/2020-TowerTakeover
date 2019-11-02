@@ -27,7 +27,7 @@
 
 using namespace vex;
 
-#define IS_COMPETITION 0
+#define IS_COMPETITION 1
 
 // Convenience preprocessor defs for wrapping controller inputs in lambda functions
 // Need this to pass inputs to subsystems
@@ -58,7 +58,7 @@ void teleop() {
 }
 
 void auton() {
-
+  task::sleep(100);
 }
 
 /**
@@ -98,7 +98,7 @@ int main() {
   Competition.autonomous(auton);
   Competition.drivercontrol(teleop);
 
-  sleep(100);
+  task::sleep(100);
 
   while(1) {
     task::sleep(100);

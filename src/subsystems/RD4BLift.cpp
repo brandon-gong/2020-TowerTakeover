@@ -39,8 +39,8 @@ RD4BLift::RD4BLift(AxisInput axisInput, int32_t leftMotorPort, int32_t rightMoto
       this->liftMotor0.resetPosition();
       this->liftMotor1.resetRotation();
       this->liftMotor1.resetPosition();
-      this->liftMotor0.setBrake(brakeType::hold);
-      this->liftMotor1.setBrake(brakeType::hold);
+      this->liftMotor0.setBrake(brakeType::brake);
+      this->liftMotor1.setBrake(brakeType::brake);
       this->state = State::MANUAL;
   }
 
@@ -68,8 +68,8 @@ RD4BLift::RD4BLift( AxisInput manualInput,
   this->liftMotor0.resetPosition();
   this->liftMotor1.resetRotation();
   this->liftMotor1.resetPosition();
-  this->liftMotor0.setBrake(brakeType::hold);
-  this->liftMotor1.setBrake(brakeType::hold);
+  this->liftMotor0.setBrake(brakeType::brake);
+  this->liftMotor1.setBrake(brakeType::brake);
 }
 
 /*
@@ -113,23 +113,23 @@ void RD4BLift::update() {
  */
 void RD4BLift::stateManual() {
   // TODO scale inputs??
-  int32_t input = (abs(this->manualInput()) > _RD4BLIFT_H_DBAND) ? this->manualInput() : 0;
+  //int32_t input = (abs(this->manualInput()) > _RD4BLIFT_H_DBAND) ? this->manualInput() : 0;
 
   // Safety features: check to make sure the lift position isn't outside of the correct range;
   // if it is, only allow it to move in the direction back to the correct range.
-  if(this->liftMotor0.position(rotationUnits::raw) >= _RD4BLIFT_H_MAX_HEIGHT && input > 0) {
-    this->liftMotor0.stop(brakeType::brake);
-    this->liftMotor1.stop(brakeType::brake);
-    return;
-  } else if(this->liftMotor0.position(rotationUnits::raw) <= 0 && input < 0) {
-    this->liftMotor0.stop(brakeType::brake);
-    this->liftMotor1.stop(brakeType::brake);
-    return;
-  }
+  // if(this->liftMotor0.position(rotationUnits::raw) >= _RD4BLIFT_H_MAX_HEIGHT && input > 0) {
+  //   this->liftMotor0.stop(brakeType::brake);
+  //   this->liftMotor1.stop(brakeType::brake);
+  //   return;
+  // } else if(this->liftMotor0.position(rotationUnits::raw) <= 0 && input < 0) {
+  //   this->liftMotor0.stop(brakeType::brake);
+  //   this->liftMotor1.stop(brakeType::brake);
+  //   return;
+  // }
 
   // Then pretty much directly apply the input to the motors as percent output.
   this->liftMotor0.setVelocity(this->manualInput(), percent);
-  this->liftMotor1.setVelocity(this->manualInput(), percent);
+  this->liftMotor1.setVelocity(-1 * this->manualInput(), percent);
   this->liftMotor0.spin(forward);
   this->liftMotor1.spin(forward);
 }
