@@ -27,13 +27,23 @@
  * either via direct assignment or the copy constructor.
  * Delegates to the more thorough but longer `RD4BLift` constructor.
  */
+
 RD4BLift::RD4BLift(AxisInput axisInput, int32_t leftMotorPort, int32_t rightMotorPort):
-  RD4BLift::RD4BLift( axisInput,
-              [](){return false;},
-              [](){return false;},
-              [](){return false;},
-              leftMotorPort,
-              rightMotorPort ) {}
+    liftMotor0(leftMotorPort),
+    liftMotor1(rightMotorPort) {
+      this->manualInput = axisInput;
+      this->groundInput = [](){return false;};
+      this->lowerTowerInput = [](){return false;};
+      this->upperTowerInput = [](){return false;};
+      this->liftMotor0.resetRotation();
+      this->liftMotor0.resetPosition();
+      this->liftMotor1.resetRotation();
+      this->liftMotor1.resetPosition();
+      this->liftMotor0.setBrake(brakeType::hold);
+      this->liftMotor1.setBrake(brakeType::hold);
+      this->state = State::MANUAL;
+  }
+
 
 /*
  * Assign all of the constructor parameters to the private internal variables,
@@ -58,6 +68,8 @@ RD4BLift::RD4BLift( AxisInput manualInput,
   this->liftMotor0.resetPosition();
   this->liftMotor1.resetRotation();
   this->liftMotor1.resetPosition();
+  this->liftMotor0.setBrake(brakeType::hold);
+  this->liftMotor1.setBrake(brakeType::hold);
 }
 
 /*
@@ -78,7 +90,7 @@ void RD4BLift::update() {
   } else if(this->lowerTowerInput()) {
     this->state = State::LOWER_TOWER;
   } else if(this->upperTowerInput()) {
-    this->state = State::LOWER_TOWER;
+    this->state = State::UPPER_TOWER;
   }
 
   // Then execute the corresponding state function
@@ -118,28 +130,42 @@ void RD4BLift::stateManual() {
   // Then pretty much directly apply the input to the motors as percent output.
   this->liftMotor0.setVelocity(this->manualInput(), percent);
   this->liftMotor1.setVelocity(this->manualInput(), percent);
+  this->liftMotor0.spin(forward);
+  this->liftMotor1.spin(forward);
 }
 
 /*
  * Set the `RD4BLift` position to the lowermost position, and hold it there.
  */
 void RD4BLift::stateGround() {
-  this->liftMotor0.rotateTo(_RD4BLIFT_H_FLOOR, rotationUnits::raw, false);
-  this->liftMotor1.rotateTo(_RD4BLIFT_H_FLOOR, rotationUnits::raw, false);
+  this->liftMotor0.startRotateTo(_RD4BLIFT_H_FLOOR, rotationUnits::rev);
+  this->liftMotor1.startRotateTo(_RD4BLIFT_H_FLOOR, rotationUnits::rev);
+  // this->liftMotor0.setVelocity(20, percent);
+  // this->liftMotor1.setVelocity(20, percent);
+  // this->liftMotor0.spin(forward);
+  // this->liftMotor1.spin(forward);
 }
 
 /*
  * Set the `RD4BLift` position to the lower tower position, and hold it there.
  */
 void RD4BLift::stateLowerTower() {
-  this->liftMotor0.rotateTo(_RD4BLIFT_H_LOWER_TOWER, rotationUnits::raw, false);
-  this->liftMotor1.rotateTo(_RD4BLIFT_H_LOWER_TOWER, rotationUnits::raw, false);
+  this->liftMotor0.startRotateTo(_RD4BLIFT_H_LOWER_TOWER, rotationUnits::rev);
+  this->liftMotor1.startRotateTo(_RD4BLIFT_H_LOWER_TOWER, rotationUnits::rev);
+  // this->liftMotor0.setVelocity(40, percent);
+  // this->liftMotor1.setVelocity(40, percent);
+  // this->liftMotor0.spin(forward);
+  // this->liftMotor1.spin(forward);
 }
 
 /*
  * Set the `RD4BLift` position to the upper tower position, and hold it there.
  */
 void RD4BLift::stateUpperTower() {
-  this->liftMotor0.rotateTo(_RD4BLIFT_H_UPPER_TOWER, rotationUnits::raw, false);
-  this->liftMotor1.rotateTo(_RD4BLIFT_H_UPPER_TOWER, rotationUnits::raw, false);
+  // this->liftMotor0.startRotateTo(_RD4BLIFT_H_UPPER_TOWER, rotationUnits::raw);
+  // this->liftMotor1.startRotateTo(_RD4BLIFT_H_UPPER_TOWER, rotationUnits::raw);
+  this->liftMotor0.setVelocity(60, percent);
+  this->liftMotor1.setVelocity(60, percent);
+  this->liftMotor0.spin(forward);
+  this->liftMotor1.spin(forward);
 }

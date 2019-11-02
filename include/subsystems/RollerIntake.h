@@ -20,29 +20,30 @@
  * THE SOFTWARE.
  */
 
-using namespace vex;
+#include "Subsystem.h"
+
+#ifndef _ROLLER_H_
+#define _ROLLER_H_
+
+#define _ROLLER_H_POWER 75
 
 /**
- * Defines a few global constants for motor and sensor ports.
- * All references to motor ports throughout the code should reference these
- * definitions, so that code modifications should be minimal if we rewire
- * or switch ports for any of the motors or sensors.
- *
- * @author Brandon Gong
- * @date 10-26-19
-  */
+ * 
+ */
+class RollerIntake : public Subsystem {
 
-#ifndef _ROBOTMAP_H_
-#define _ROBOTMAP_H_
+  public:
+  
+    void update() override;
+    RollerIntake( ButtonInput inInput,
+                  ButtonInput outInput,
+                  int32_t leftMotorPort,
+                  int32_t rightMotorPort );
 
-// todo fix
-#define FRONT_LEFT_MOTOR_PORT PORT20
-#define FRONT_RIGHT_MOTOR_PORT PORT11
-#define BACK_LEFT_MOTOR_PORT PORT19
-#define BACK_RIGHT_MOTOR_PORT PORT12
-#define LIFT_LEFT_MOTOR_PORT PORT9
-#define LIFT_RIGHT_MOTOR_PORT PORT10
-#define ROLLER_LEFT_MOTOR_PORT PORT8
-#define ROLLER_RIGHT_MOTOR_PORT PORT2
+  private:
+    ButtonInput inInput, outInput;
+    motor left, right;
+
+};
 
 #endif

@@ -34,10 +34,10 @@
  * Defines encoder values, measured in raw units, of the min/max positions of the lift,
  * the lower tower, and the upper tower.  These may need to be tuned periodically.
  */
-#define _RD4BLIFT_H_MAX_HEIGHT 1000
+#define _RD4BLIFT_H_MAX_HEIGHT 10000
 #define _RD4BLIFT_H_FLOOR 0
-#define _RD4BLIFT_H_LOWER_TOWER 300
-#define _RD4BLIFT_H_UPPER_TOWER 700
+#define _RD4BLIFT_H_LOWER_TOWER 1
+#define _RD4BLIFT_H_UPPER_TOWER 2
 
 /**
  * Defines a subsystem for controlling an RD4B lift.

@@ -20,22 +20,26 @@
  * THE SOFTWARE.
  */
 
-#include "subsystems/MecanumDrive.h"
+#include "subsystems/MecanumDriveTank.h"
 
 /*
  * Assign all of the constructor parameters to the private internal variables,
  * either via direct assignment or the copy constructor.
  * TODO: if we do anything autonomous, encoders should be reset here
  */
-MecanumDrive::MecanumDrive(AxisInput drive, AxisInput strafe, AxisInput twist,
+MecanumDriveTank::MecanumDriveTank(AxisInput lDrive, AxisInput rDrive, AxisInput strafe,
                            int32_t fr, int32_t fl, int32_t br, int32_t bl) :
   frontRight(fr),
   frontLeft(fl),
   backRight(br),
   backLeft(bl) {
-  this->driveAxis = drive;
+  this->lDriveAxis = lDrive;
+  this->rDriveAxis = rDrive;
   this->strafeAxis = strafe;
-  this->twistAxis = twist;
+  this->frontRight.setBrake(brakeType::brake);
+  this->frontLeft.setBrake(brakeType::brake);
+  this->backRight.setBrake(brakeType::brake);
+  this->backLeft.setBrake(brakeType::brake);
 };
 
 /*
@@ -43,53 +47,35 @@ MecanumDrive::MecanumDrive(AxisInput drive, AxisInput strafe, AxisInput twist,
  * either via direct assignment or the copy constructor.
  * TODO: if we do anything autonomous, encoders should be reset here
  */
-MecanumDrive::MecanumDrive(AxisInput inputs[3], motor motors[4]) :
+MecanumDriveTank::MecanumDriveTank(AxisInput inputs[3], motor motors[4]) :
   frontRight(motors[0]),
   frontLeft(motors[1]),
   backRight(motors[2]),
   backLeft(motors[3]) {
-  driveAxis = inputs[0];
-  strafeAxis = inputs[1];
-  twistAxis = inputs[2];
+  lDriveAxis = inputs[0];
+  rDriveAxis = inputs[1];
+  strafeAxis = inputs[2];
+  this->frontRight.setBrake(brakeType::brake);
+  this->frontLeft.setBrake(brakeType::brake);
+  this->backRight.setBrake(brakeType::brake);
+  this->backLeft.setBrake(brakeType::brake);
 };
 
-/*
- * Called once per tick
- */
-void MecanumDrive::update() {
+void MecanumDriveTank::update() {
 
   // Get input values from the AxisInput functions for all 3 axes,
   // inverting if necessary
-  int32_t drivePower  = this->driveAxis();
+  int32_t lDrivePower  = this->lDriveAxis();
+  int32_t rDrivePower  = -this->rDriveAxis();
   int32_t strafePower = this->strafeAxis();
-  int32_t twistPower  = this->twistAxis();
 
   // Apply deadband (zero out input if it is less than the deadband)
-  drivePower  = (abs(drivePower) > _MECDRIVE_H_DEADBAND) ? drivePower : 0;
-  strafePower = (abs(strafePower) > _MECDRIVE_H_DEADBAND) ? strafePower : 0;
-  twistPower  = (abs(twistPower) > _MECDRIVE_H_DEADBAND) ? twistPower : 0;
+  lDrivePower  = (abs(lDrivePower) > _MDT_H_DEADBAND) ? lDrivePower : 0;
+  rDrivePower  = (abs(rDrivePower) > _MDT_H_DEADBAND) ? rDrivePower : 0;
+  strafePower = (abs(strafePower) > _MDT_H_DEADBAND) ? strafePower : 0;
 
-  // Apply cubic interpolation if needed.  TODO: tweak so the deadband doesn't grow as well
-  if(_MECDRIVE_H_CUBIC_DRIVE) {
-    // Scale input down from -100...100 to -1...1
-    double scaled = (double) drivePower / 100;
-    // cube it
-    scaled =  scaled *  scaled *  scaled;
-    // Scale it back up from -1...1 to -100...100,
-    // truncating off the rest of the decimal spots.
-    drivePower = (int32_t)  (scaled * 100);
-  }
-  // Same process for strafe and twist
-  if(_MECDRIVE_H_CUBIC_STRAFE) {
-    double scaled = (double) strafePower / 100;
-    scaled =  scaled *  scaled *  scaled;
-    strafePower = (int32_t)  (scaled * 100);
-  }
-  if(_MECDRIVE_H_CUBIC_TWIST) {
-    double scaled = (double) twistPower / 100;
-    scaled =  scaled *  scaled *  scaled;
-    twistPower = (int32_t)  (scaled * 100);
-  }
+  int32_t drivePower = (lDrivePower + rDrivePower) * 0.5;
+  int32_t twistPower = (lDrivePower - rDrivePower) * 0.5;
 
   // Calculate the power of each motor based on the drive, strafe, and twist powers,
   // in the order front-left, front-right, back-left, back-right.

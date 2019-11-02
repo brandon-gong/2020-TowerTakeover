@@ -21,27 +21,45 @@
  */
 
 #include "vex.h"
-#include "subsystems/MecanumDrive.h"
+#include "subsystems/MecanumDriveTank.h"
 #include "subsystems/RD4BLift.h"
+#include "subsystems/RollerIntake.h"
 
 using namespace vex;
+
+#define IS_COMPETITION 0
 
 // Convenience preprocessor defs for wrapping controller inputs in lambda functions
 // Need this to pass inputs to subsystems
 #define AxisInput(x)   ([&]() -> int32_t {return joystick.x.position();})
 #define ButtonInput(y) ([&]() -> bool    {return joystick.y.pressing();})
 
+Subsystem* subsystems[3];
+
 // Global controller instance.
 controller joystick = controller(primary);
+competition Competition;
 
 // Convert the L1 and R1 bumpers (button inputs) into one axis input.
 int32_t bumperAxisInput() {
-  int32_t power = 80;
+  int32_t power = 75;
   // if both buttons are pressed, no power is supplied. if both are pressed, then they cancel out
-  if(joystick.ButtonL1.pressing() == joystick.ButtonR1.pressing()) return 0;
-  else if(joystick.ButtonL1.pressing()) return +power;
-  else return -power;
+  if(joystick.ButtonUp.pressing() == joystick.ButtonDown.pressing()) return 0;
+  else if(joystick.ButtonUp.pressing()) return +power;
+  else return -power + 30;
 };
+
+void teleop() {
+  // Continuously update all of the subsystems in the `subsystems` array
+  while(true) {
+    for(Subsystem* subsystem : subsystems) subsystem->update();
+    wait(25, msec);
+  }
+}
+
+void auton() {
+
+}
 
 /**
  * Main entry point of the code.
@@ -52,30 +70,42 @@ int32_t bumperAxisInput() {
 int main() {
 
   // Initialize all of the subsystems.
-  Subsystem* subsystems[] = {
-    new MecanumDrive(
-      AxisInput(Axis3), // left joystick up & down
-      AxisInput(Axis4), // left joystick right & left
-      AxisInput(Axis1), // right joystick right & left
+  subsystems[0] = 
+    new RD4BLift(
+      bumperAxisInput, // didn't have enough axes to work with, so this is bumper L1 and R1
+      LIFT_LEFT_MOTOR_PORT,
+      LIFT_RIGHT_MOTOR_PORT
+    );
+  subsystems[1] = 
+    new RollerIntake(
+      ButtonInput(ButtonR1),
+      ButtonInput(ButtonR2),
+      ROLLER_LEFT_MOTOR_PORT,
+      ROLLER_RIGHT_MOTOR_PORT
+    );
+  subsystems[2] = 
+    new MecanumDriveTank(
+      AxisInput(Axis3),
+      AxisInput(Axis2),
+      AxisInput(Axis1),
       FRONT_RIGHT_MOTOR_PORT,
       FRONT_LEFT_MOTOR_PORT,
       BACK_RIGHT_MOTOR_PORT,
-      BACK_LEFT_MOTOR_PORT),
-    new RD4BLift(
-      bumperAxisInput, // didn't have enough axes to work with, so this is bumper L1 and R1
-      ButtonInput(ButtonB), // B
-      ButtonInput(ButtonY), // Y
-      ButtonInput(ButtonX), // X
-      LIFT_LEFT_MOTOR_PORT,
-      LIFT_RIGHT_MOTOR_PORT
-    )
-  };
+      BACK_LEFT_MOTOR_PORT
+    );
 
-  // Continuously update all of the subsystems in the `subsystems` array
-  while(true) {
-    for(Subsystem* subsystem : subsystems) subsystem->update();
-    wait(25, msec);
+#if IS_COMPETITION
+  Competition.autonomous(auton);
+  Competition.drivercontrol(teleop);
+
+  sleep(100);
+
+  while(1) {
+    task::sleep(100);
   }
+#else
+  teleop();
+#endif
 
   return 0;
 }

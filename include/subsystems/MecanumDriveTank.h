@@ -22,25 +22,18 @@
 
 #include "Subsystem.h"
 
-#ifndef _MECDRIVE_H_
-#define _MECDRIVE_H_
+#ifndef _MDT_H_
+#define _MDT_H_
 
-// Defines whether to convert inputs into motor percent outputs in a linear (false)
-// or cubic (true) manner.  Use cubic for more sensitivity at lower speeds.
-#define _MECDRIVE_H_CUBIC_DRIVE false
-#define _MECDRIVE_H_CUBIC_STRAFE false
-#define _MECDRIVE_H_CUBIC_TWIST true
-
-// Defines a ring around the center of the joystick where inputs are ignored
-#define _MECDRIVE_H_DEADBAND 5
+#define _MDT_H_DEADBAND 5
 
 /**
- * Defines a subsystem for controlling a Mecanum drive base.
+ * Defines a subsystem for controlling a Mecanum drive base (Tank drive).
  *
  * @author Brandon Gong
  * @date 10-26-19
  */
-class MecanumDrive : public Subsystem {
+class MecanumDriveTank : public Subsystem {
 
   public:
 
@@ -51,40 +44,41 @@ class MecanumDrive : public Subsystem {
     void update() override;
 
     /**
-     * Creates a new instance of the Mecanum Drive subsystem.
+     * Creates a new instance of the Mecanum Drive Tank subsystem.
      *
      * @param
-     *    drive - A function which returns the position of the drive joystick axis.
+     *    lDrive - A function which returns the position of the left drive joystick axis.
+     *    rDrive - A function which returns the position of the right drive joystick axis.
      *    strafe - A function which returns the position of the strafe joystick axis.
-     *    twist - A function which returns the position of the twist joystick axis.
      *    fr - The port number of the front-right motor.
      *    fl - The port number of the front-left motor.
      *    br - The port number of the back-right motor.
      *    bl - The port number of the back-left motor.
      */
-    MecanumDrive( AxisInput drive,
+    MecanumDriveTank( AxisInput lDrive,
+                  AxisInput rDrive,
                   AxisInput strafe,
-                  AxisInput twist,
                   int32_t fr,
                   int32_t fl,
                   int32_t br,
                   int32_t bl );
-
+    
     /**
-     * Creates a new instance of the Mecanum Drive subsystem.
+     * Creates a new instance of the Mecanum Drive Tank subsystem.
      *
      * @param
-     *    inputs - An array of 3 functions that return the positions of the drive,
-     *             strafe, and twist axes, respectively.
+     *    inputs - An array of 3 functions that return the positions of the left drive,
+     *             right drive, and strafe axes, respectively.
      *    motors - An array of 4 vex::motor that represent the front-right, front-left,
      *             back-right, and back-left motors of the drive base, respectively.
      */
-    MecanumDrive(AxisInput inputs[3], motor motors[4]);
-
+    MecanumDriveTank(AxisInput inputs[3], motor motors[4]);
+  
   private:
     // Internal variables for inputs and motors.
-    AxisInput driveAxis, strafeAxis, twistAxis;
+    AxisInput lDriveAxis, rDriveAxis, strafeAxis;
     motor frontRight, frontLeft, backRight, backLeft;
+
 };
 
 #endif

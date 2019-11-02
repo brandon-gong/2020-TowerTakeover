@@ -20,29 +20,36 @@
  * THE SOFTWARE.
  */
 
-using namespace vex;
+#include "subsystems/RollerIntake.h"
 
-/**
- * Defines a few global constants for motor and sensor ports.
- * All references to motor ports throughout the code should reference these
- * definitions, so that code modifications should be minimal if we rewire
- * or switch ports for any of the motors or sensors.
- *
- * @author Brandon Gong
- * @date 10-26-19
-  */
+RollerIntake::RollerIntake( ButtonInput inInput,
+                            ButtonInput outInput,
+                            int32_t leftMotorPort,
+                            int32_t rightMotorPort ):
+  left(leftMotorPort),
+  right(rightMotorPort) {
+  this->inInput = inInput;
+  this->outInput = outInput;
+  this->left.setBrake(brakeType::hold);
+  this->right.setBrake(brakeType::hold);
+}
 
-#ifndef _ROBOTMAP_H_
-#define _ROBOTMAP_H_
-
-// todo fix
-#define FRONT_LEFT_MOTOR_PORT PORT20
-#define FRONT_RIGHT_MOTOR_PORT PORT11
-#define BACK_LEFT_MOTOR_PORT PORT19
-#define BACK_RIGHT_MOTOR_PORT PORT12
-#define LIFT_LEFT_MOTOR_PORT PORT9
-#define LIFT_RIGHT_MOTOR_PORT PORT10
-#define ROLLER_LEFT_MOTOR_PORT PORT8
-#define ROLLER_RIGHT_MOTOR_PORT PORT2
-
-#endif
+void RollerIntake::update() {
+  // if both buttons are pressed, no power is supplied. if both are pressed, then they cancel out
+  if(inInput() == outInput()) {
+    this->right.setVelocity(0, percent);
+    this->left.setVelocity(0, percent);
+    this->right.spin(forward);
+    this->left.spin(forward);
+  } else if(outInput()) {
+    this->right.setVelocity(_ROLLER_H_POWER, percent);
+    this->left.setVelocity(-1 * _ROLLER_H_POWER, percent);
+    this->right.spin(forward);
+    this->left.spin(forward);
+  } else {
+    this->right.setVelocity(-1 * _ROLLER_H_POWER, percent);
+    this->left.setVelocity(_ROLLER_H_POWER, percent);
+    this->right.spin(forward);
+    this->left.spin(forward);
+  }
+}
