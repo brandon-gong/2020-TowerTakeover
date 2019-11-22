@@ -27,7 +27,7 @@
  * either via direct assignment or the copy constructor.
  * TODO: if we do anything autonomous, encoders should be reset here
  */
-MecanumDriveTank::MecanumDriveTank(AxisInput lDrive, AxisInput rDrive, AxisInput strafe,
+MecanumDriveTank::MecanumDriveTank(AxisInput lDrive, AxisInput rDrive, AxisInput strafe, ButtonInput halfDrive,
                            int32_t fr, int32_t fl, int32_t br, int32_t bl) :
   frontRight(fr),
   frontLeft(fl),
@@ -36,6 +36,7 @@ MecanumDriveTank::MecanumDriveTank(AxisInput lDrive, AxisInput rDrive, AxisInput
   this->lDriveAxis = lDrive;
   this->rDriveAxis = rDrive;
   this->strafeAxis = strafe;
+  this->halfDrive = halfDrive;
   this->frontRight.setBrake(brakeType::coast);
   this->frontLeft.setBrake(brakeType::coast);
   this->backRight.setBrake(brakeType::coast);
@@ -73,6 +74,19 @@ void MecanumDriveTank::update() {
   lDrivePower  = (abs(lDrivePower) > _MDT_H_DEADBAND) ? lDrivePower : 0;
   rDrivePower  = (abs(rDrivePower) > _MDT_H_DEADBAND) ? rDrivePower : 0;
   strafePower = (abs(strafePower) > _MDT_H_DEADBAND) ? strafePower : 0;
+
+  // Apply cubic
+  lDrivePower = lDrivePower * lDrivePower * lDrivePower / 10000;
+  rDrivePower = rDrivePower * rDrivePower * rDrivePower / 10000;
+  strafePower = strafePower * strafePower * strafePower / 10000;
+
+  // halfdrive is a bututon that when pressed halves the driving speed for finer
+  // control.
+  if(this->halfDrive()) {
+    lDrivePower /= 2;
+    rDrivePower /= 2;
+    strafePower /= 2;
+  }
 
   int32_t drivePower = (lDrivePower + rDrivePower) * 0.5;
   int32_t twistPower = (lDrivePower - rDrivePower) * 0.5;

@@ -54,6 +54,7 @@ class RollerIntake : public Subsystem {
                   int32_t rightMotorPort );
 
   private:
+
     ButtonInput inInput, outInput;
     motor left, right;
 

@@ -58,6 +58,7 @@ class MecanumDriveTank : public Subsystem {
     MecanumDriveTank( AxisInput lDrive,
                   AxisInput rDrive,
                   AxisInput strafe,
+                  ButtonInput halfDrive,
                   int32_t fr,
                   int32_t fl,
                   int32_t br,
@@ -73,10 +74,12 @@ class MecanumDriveTank : public Subsystem {
      *             back-right, and back-left motors of the drive base, respectively.
      */
     MecanumDriveTank(AxisInput inputs[3], motor motors[4]);
-  
+
   private:
+
     // Internal variables for inputs and motors.
     AxisInput lDriveAxis, rDriveAxis, strafeAxis;
+    ButtonInput halfDrive;
     motor frontRight, frontLeft, backRight, backLeft;
 
 };

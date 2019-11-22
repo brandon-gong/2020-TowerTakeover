@@ -27,8 +27,8 @@
 
 // Defines whether to convert inputs into motor percent outputs in a linear (false)
 // or cubic (true) manner.  Use cubic for more sensitivity at lower speeds.
-#define _MDA_H_CUBIC_DRIVE false
-#define _MDA_H_CUBIC_STRAFE false
+#define _MDA_H_CUBIC_DRIVE true
+#define _MDA_H_CUBIC_STRAFE true
 #define _MDA_H_CUBIC_TWIST true
 
 // Defines a ring around the center of the joystick where inputs are ignored

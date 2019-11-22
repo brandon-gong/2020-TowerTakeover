@@ -40,13 +40,31 @@ Subsystem* subsystems[3];
 controller joystick = controller(primary);
 competition Competition;
 
-// Convert the L1 and R1 bumpers (button inputs) into one axis input.
-int32_t bumperAxisInput() {
+// TODO clean competition junk
+motor fl(FRONT_LEFT_MOTOR_PORT),
+      fr(FRONT_RIGHT_MOTOR_PORT),
+      bl(BACK_LEFT_MOTOR_PORT),
+      br(BACK_RIGHT_MOTOR_PORT),
+      il(ROLLER_LEFT_MOTOR_PORT),
+      ir(ROLLER_RIGHT_MOTOR_PORT);
+
+
+// Convert the up and down inputs (button inputs) into one axis input.
+int32_t updownAxisInput() {
   int32_t power = 75;
-  // if both buttons are pressed, no power is supplied. if both are pressed, then they cancel out
-  if(joystick.ButtonUp.pressing() == joystick.ButtonDown.pressing()) return 0;
-  else if(joystick.ButtonUp.pressing()) return +power;
+  // if no buttons are pressed, no power is supplied. if both are pressed, then they cancel out
+  if(joystick.ButtonL1.pressing() == joystick.ButtonL2.pressing()) return 0;
+  else if(joystick.ButtonL1.pressing()) return +power;
   else return -power + 30;
+};
+
+// Convert the up and down inputs (button inputs) into one axis input.
+int32_t yaAxisInput() {
+  int32_t power = 75;
+  // if no buttons are pressed, no power is supplied. if both are pressed, then they cancel out
+  if(joystick.ButtonA.pressing() == joystick.ButtonY.pressing()) return 0;
+  else if(joystick.ButtonA.pressing()) return +power;
+  else return -power;
 };
 
 void teleop() {
@@ -57,8 +75,69 @@ void teleop() {
   }
 }
 
+// todo clean
 void auton() {
-  task::sleep(100);
+  fl.setVelocity(-50, percent);
+  fr.setVelocity(50, percent);
+  bl.setVelocity(-50, percent);
+  br.setVelocity(50, percent);
+  fl.spin(forward);
+  fr.spin(forward);
+  bl.spin(forward);
+  br.spin(forward);
+  task::sleep(2000);
+  fl.stop(brakeType::brake);
+  fr.stop(brakeType::brake);
+  bl.stop(brakeType::brake);
+  br.stop(brakeType::brake);
+  il.setVelocity(-50, percent);
+  ir.setVelocity(50, percent);
+  fl.setVelocity(20, percent);
+  fr.setVelocity(-20, percent);
+  bl.setVelocity(20, percent);
+  br.setVelocity(-20, percent);
+  fl.spin(forward);
+  fr.spin(forward);
+  bl.spin(forward);
+  br.spin(forward);
+  ir.spin(forward);
+  il.spin(forward);
+  task::sleep(3000);
+  fl.stop(brakeType::brake);
+  fr.stop(brakeType::brake);
+  bl.stop(brakeType::brake);
+  br.stop(brakeType::brake);
+  il.stop(brakeType::brake);
+  ir.stop(brakeType::brake);
+  task::sleep(300);
+  fl.setVelocity(-50, percent);
+  fr.setVelocity(50, percent);
+  bl.setVelocity(-50, percent);
+  br.setVelocity(50, percent);
+  fl.spin(forward);
+  fr.spin(forward);
+  bl.spin(forward);
+  br.spin(forward);
+  task::sleep(1250);
+  fl.stop(brakeType::brake);
+  fr.stop(brakeType::brake);
+  bl.stop(brakeType::brake);
+  br.stop(brakeType::brake);
+  task::sleep(300);
+  fl.setVelocity(50, percent);
+  fr.setVelocity(-50, percent);
+  bl.setVelocity(50, percent);
+  br.setVelocity(-50, percent);
+  fl.spin(forward);
+  fr.spin(forward);
+  bl.spin(forward);
+  br.spin(forward);
+  task::sleep(3000);
+  fl.stop(brakeType::brake);
+  fr.stop(brakeType::brake);
+  bl.stop(brakeType::brake);
+  br.stop(brakeType::brake);
+  task::sleep(300);
 }
 
 /**
@@ -72,7 +151,7 @@ int main() {
   // Initialize all of the subsystems.
   subsystems[0] = 
     new RD4BLift(
-      bumperAxisInput, // didn't have enough axes to work with, so this is bumper L1 and R1
+      updownAxisInput, // didn't have enough axes to work with, so this is bumper L1 and R1
       LIFT_LEFT_MOTOR_PORT,
       LIFT_RIGHT_MOTOR_PORT
     );
@@ -87,7 +166,8 @@ int main() {
     new MecanumDriveTank(
       AxisInput(Axis3),
       AxisInput(Axis2),
-      AxisInput(Axis1),
+      yaAxisInput,
+      ButtonInput(ButtonB),
       FRONT_RIGHT_MOTOR_PORT,
       FRONT_LEFT_MOTOR_PORT,
       BACK_RIGHT_MOTOR_PORT,
